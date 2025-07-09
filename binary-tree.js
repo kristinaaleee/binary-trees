@@ -14,25 +14,80 @@ class Tree{
         this.root = buildTree(array); 
     }
 
-    insert(value, root = this.root){
-        let currentNode = root
-        console.log(currentNode)
 
-        if (currentNode === null) return currentNode = new Node(value);
+    _getsucc(succ) {
+        console.log(succ)
+       // Find next closest element value in right tree
+        succ = succ.right;
 
-        if (currentNode.data === value) return this.root;
-
-        if (value < currentNode.data)  this.insert(value, currentNode.left)
-
-        else if (value > currentNode.data) this.insert(value, currentNode.right)
-
-        return currentNode
+        // Steps down to number closest to deleted value in right tree
+        while (succ !== null && succ.left !== null) {
+            succ = succ.left;
+        }
+        return succ;
     }
-    // methods that manipulate balanced tree from this.root
+
+    insert(value, root = this.root){
+        if (root === null) return new Node(value);
+        
+        if (root.data === value) return root;
+
+        if (value < root.data)  root.left = this.insert(value, root.left);
+
+        else if (value > root.data) root.right = this.insert(value, root.right);
+
+        return root;
+    }
+    
+    delete(value, root = this.root){
+        if (root === null) return root;
+
+        //Search tree for value
+        if (value < root.data) root.left = this.delete(value, root.left);
+
+        else if (value > root.data) root.right = this.delete(value, root.right);
+
+        // Delete by returning root below 
+        else{
+
+            // Delete root only has right child
+            if(root.left === null) return root.right
+
+            // Delete root only has left child
+            if(root.right === null) return root.left
+
+            let succ = this._getsucc(root);
+
+            //Overwrite root with new successor
+            root.data = succ.data;
+            root.right = this.delete(succ.data, root.right);
+        }
+
+        return root;
+    }
+
+    find(value){
+        let root = this.root
+        while (root != null){
+            if (value === root.data) return root
+            if (value < root.data) root = root.left
+            else if (value > root.data) root = root.right
+        }
+        return 'does not exist'
+    }
+
+    levelOrder(callback, root = this.root, level = 0, array = []){
+
+        if (root === null) return;
+
+        i
+        // Breadth first level order
+        // Callback function on each node
+        // Throw error for no callback function
+    }
 }
 
 function buildTree(array){
-    console.log('Running build..')
     // Sort array
     let sortedArray = mergeSort(array);
 
@@ -47,7 +102,6 @@ function buildTree(array){
 
 // Recursive function to split array and set middle node as root
 function recursiveTree(array, start, end){
-    console.log('Running recursive..')
     if (start > end) return null;
 
     let mid = Math.floor((start + end) / 2)
@@ -76,6 +130,8 @@ const prettyPrint = (node, prefix = '', isLeft = true) => {
 
 let sampleArray = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324];
 const tree = new Tree(sampleArray)
-tree.insert(6);
 prettyPrint(tree.root);
+console.log(tree.find(24));
+
+
 
