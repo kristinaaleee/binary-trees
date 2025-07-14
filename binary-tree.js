@@ -1,4 +1,6 @@
-import { mergeSort } from "../recursion/merge.js"
+import { mergeSort } from "../recursion/merge.js";
+
+export { Tree };
 
 class Node {
     constructor(data){
@@ -13,7 +15,6 @@ class Tree{
         this.array = array;
         this.root = buildTree(array); 
     }
-
 
     _getsucc(succ) {
         console.log(succ)
@@ -51,10 +52,10 @@ class Tree{
         else{
 
             // Delete root only has right child
-            if(root.left === null) return root.right
+            if(root.left === null) return root.right;
 
             // Delete root only has left child
-            if(root.right === null) return root.left
+            if(root.right === null) return root.left;
 
             let succ = this._getsucc(root);
 
@@ -62,23 +63,22 @@ class Tree{
             root.data = succ.data;
             root.right = this.delete(succ.data, root.right);
         }
-
         return root;
     }
 
     find(value){
-        let root = this.root
+        let root = this.root;
         while (root != null){
-            if (value === root.data) return root
-            if (value < root.data) root = root.left
-            else if (value > root.data) root = root.right
+            if (value === root.data) return root;
+            if (value < root.data) root = root.left;
+            else if (value > root.data) root = root.right;
         }
-        return null
+        return null;
     }
 
     levelOrderRec(callback, root = this.root, level = 0, result = []){
         // Require callback function
-        if (!callback) throw new Error('Must include callback function!')
+        if (!callback) throw new Error('Must include callback function!');
 
         // Base case
         if (root === null) return;
@@ -96,7 +96,7 @@ class Tree{
     }
 
     levelOrderIte(callback, root = this.root){
-        if (!callback) throw new Error('Must include callback function!')
+        if (!callback) throw new Error('Must include callback function!');
         if (root === null) return [];
 
         let queue = [];
@@ -112,32 +112,32 @@ class Tree{
             for (let i = 0; i < len; i++){
                 // Selects first node and deletes
                 let node = queue.shift();
-                result[level].push(callback(node.data))
+                result[level].push(callback(node.data));
 
                 // If branches exist, push into queue and repeat
-                if (node.left != null) queue.push(node.left)
+                if (node.left != null) queue.push(node.left);
 
-                if (node.right != null) queue.push(node.right)
+                if (node.right != null) queue.push(node.right);
             }
-            level++
+            level++;
         }
         return result; 
     }
 
     inOrder(callback, root = this.root, result = []){
-        if (!callback) throw new Error('Must include callback function!')
+        if (!callback) throw new Error('Must include callback function!');
         if (root === null) return;
 
         // Left Root Right
         this.inOrder(callback, root.left, result);
-        result.push(callback(root.data))
+        result.push(callback(root.data));
         this.inOrder(callback, root.right, result);
 
         return result;
     }
 
     preOrder(callback, root = this.root, result = []){
-        if (!callback) throw new Error('Must include callback function!')
+        if (!callback) throw new Error('Must include callback function!');
         if (root === null) return;
 
         // Root Left Right
@@ -149,11 +149,10 @@ class Tree{
     }
 
     postOrder(callback, root = this.root, result = []){
-        if (!callback) throw new Error('Must include callback function!')
+        if (!callback) throw new Error('Must include callback function!');
         if (root === null) return;
 
         // Left Right Root
-
         this.postOrder(callback, root.left, result);
         this.postOrder(callback, root.right, result);
         result.push(callback(root.data));
@@ -161,34 +160,109 @@ class Tree{
         return result;
     }
     
-    height(value, root = this.root, tempHeight = 0){
-        if (root === null) return;
+    // _heightFinder(value, root, finalHeight){
+    //     if (root === null) return -1;
 
+    //     let leftHeight = this._heightFinder(value, root.left, finalHeight);
+    //     let rightHeight = this._heightFinder(value, root.right, finalHeight);
+
+    //     // height holder for larger branch
+    //     let heightHolder = Math.max(leftHeight, rightHeight) + 1
+
+    //     if (root.data === value) {
+    //         finalHeight.value = heightHolder
+    //     }
+    //     return heightHolder;
+    // }
+
+    // height(value){
+    //     // Pass by reference (using object) to allow changes to persist outside of function
+    //     let finalHeight = {value: -1}
+
+    //     this._heightFinder(value, this.root, finalHeight)
+
+    //     return finalHeight.value
+    // }
+
+    height(value){
+        let finalHeight = -1;
         
+        // Closure that can access finalHeight variable
+        function heightFinder(root){
+            if (root === null) return -1;
 
+            let leftHeight = heightFinder(root.left);
+            let rightHeight = heightFinder(root.right);
+
+            // height holder for larger branch
+            let heightHolder = Math.max(leftHeight, rightHeight) + 1
+            if (root.data === value){
+                finalHeight = heightHolder;
+            }
+            return heightHolder;
+        }
+        heightFinder(this.root);
+        return finalHeight;
     }
 
     depth(value){
         // Distance from root
-        let root = this.root
+        let root = this.root;
         let depth = 0;
         while (root != null){
             if (value === root.data) return depth;
 
             if (value < root.data) {
-                depth++
-                root = root.left
+                depth++;
+                root = root.left;
             }
 
             else if (value > root.data) {
-                depth++
-                root = root.right
+                depth++;
+                root = root.right;
             }
         }
-        return null
+        return null;
+    }  
+
+    isBalanced(){
+        // height difference between left and right sub tree no more than 1
+        let currentBalance = true;
+
+        function heightFinder(root){
+            if (root === null) return -1;
+
+            let leftHeight = heightFinder(root.left);
+            let rightHeight = heightFinder(root.right);
+
+            let difference = Math.abs(leftHeight - rightHeight);
+
+            if (difference > 1) {
+                currentBalance = false;
+            }
+            return difference;
     }
-    
-    
+    heightFinder(this.root);
+
+    return currentBalance;
+    }
+
+    rebalance(){
+        let newArray = [];
+
+        // Traverse tree recursively to obtain new array
+        function traverseTree(root){
+            if (root === null) return;
+
+            traverseTree(root.left);
+            traverseTree(root.right);
+            newArray.push(root.data);
+        }
+        traverseTree(this.root);
+
+        // Rewrite root
+        return this.root = buildTree(newArray)
+    }
 }
 
 function buildTree(array){
@@ -216,35 +290,6 @@ function recursiveTree(array, start, end){
 
     return root;
 }
-
-// Visual display of tree
-const prettyPrint = (node, prefix = '', isLeft = true) => {
-    if (node === null) {
-      return;
-    }
-    if (node.right !== null) {
-      prettyPrint(node.right, `${prefix}${isLeft ? '│   ' : '    '}`, false);
-    }
-    console.log(`${prefix}${isLeft ? '└── ' : '┌── '}${node.data}`);
-    if (node.left !== null) {
-      prettyPrint(node.left, `${prefix}${isLeft ? '    ' : '│   '}`, true);
-    }
-};
-
-function test(x){
-    return x + 1
-}
-
-let sampleArray = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324];
-const tree = new Tree(sampleArray)
-console.log(tree.root);
-prettyPrint(tree.root);
-// console.log(tree.levelOrderRec(test))
-// console.log(tree.levelOrderIte(test))
-// console.log(tree.inOrder(test))
-// console.log(tree.preOrder(test))
-// console.log(tree.postOrder(test))
-// console.log(tree.height(5))
 
 
 
